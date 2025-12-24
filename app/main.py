@@ -1,20 +1,11 @@
-from enum import Enum
-
 from fastapi import FastAPI
+from app.routers.health import router as health_router
 
 
-class ModelName(str, Enum):
-    alexnet = "alexnet"
-    resnet = "resnet"
-    lenet = "lenet"
+app = FastAPI(title="HabitOS")
 
-app = FastAPI()
+app.include_router(health_router)
 
-
-@app.get("/models/{model_name}")
-async def get_model(model_name: ModelName):
-    if model_name is ModelName.alexnet:
-        return {"model_name": model_name, "message": "Deep learning FTW!"}
-    if model_name.value == "lenet":
-        return {"model_name": model_name, "message": "LeCNN all the images"}
-    return {"model_name": model_name, "message": "Have some residuals"}
+@app.get("/hello")
+async def say_hello():
+    return {"Hello": "World"}
