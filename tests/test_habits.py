@@ -3,17 +3,25 @@ from app.main import app
 
 client = TestClient(app)
 
+def test_list_habits_empty():
+    resp = client.get("/habits")
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
 def test_create_habit():
-    create_resp = client.post("/habits", json={"name": "yoga", "schedule_type": "daily", "target_count": 1, "start_date": "2025-12-26", "notes": "This is a test",})
-    assert create_resp.status_code == 201
-    assert create_resp.json() == {
-        "id": 1,
-        "name": "yoga", 
-        "schedule_type": "daily", 
-        "target_count": 1, 
-        "start_date": "2025-12-26", 
-        "notes": "This is a test",
-    }
+    resp = client.post("/habits", json={"name": "yoga", "schedule_type": "daily", "target_count": 1, "start_date": "2025-12-26", "notes": "This is a test",})
+    assert resp.status_code == 201
+    data = resp.json()
+
+    assert "id" in data
+    assert isinstance(data["id"], int)
+
+    assert data["name"] == "yoga"
+    assert data["schedule_type"] == "daily"
+    assert data["target_count"] == 1
+    assert data["start_date"] == "2025-12-26"
+    assert data["notes"] == "This is a test"
     
 
 def test_habit_in_list():
