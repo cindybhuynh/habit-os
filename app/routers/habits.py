@@ -1,19 +1,21 @@
 from fastapi import APIRouter
 from app.schemas.habit import HabitCreate, HabitRead
+from app.services import habits as habits_service
 
 router = APIRouter(prefix="/habits", tags=["habits"])
 
-HABITS: list[HabitRead] = []
-NEXT_ID = 1
-
 @router.post("", response_model=HabitRead, status_code=201)
 def create_habit(habit_in: HabitCreate):
-    global NEXT_ID
-    habit = HabitRead(id = NEXT_ID, **habit_in.model_dump())
-    NEXT_ID += 1
-    HABITS.append(habit)
-    return habit
+    return habits_service.create_habit(habit_in)
 
 @router.get("", response_model=list[HabitRead])
 def list_habits():
-    return HABITS
+    return habits_service.list_habits()
+
+@router.get("/{habit_id}", response_model=HabitRead)
+def get_habit(habit_id: int):
+    habit = habits_service.get_habit(habit_id)
+    if habit is None:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Habit not found")
+    return habit
