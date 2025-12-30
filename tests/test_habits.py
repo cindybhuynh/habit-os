@@ -98,3 +98,27 @@ def test_empty_name():
     })
     assert resp.status_code == 422
     assert "detail" in resp.json()
+
+def test_existing_id_returns_200():
+    create_resp = client.post("/habits", json={
+        "name": "habit1", 
+        "schedule_type": "daily", 
+        "target_count": 1, 
+        "start_date": "2025-12-28", 
+    })
+    assert create_resp.status_code == 201
+    habit_id = create_resp.json()["id"]
+
+    resp = client.get(f"/habits/{habit_id}")
+    
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["id"] == habit_id
+    assert data["name"] == "habit1"
+    assert data["schedule_type"] == "daily"
+
+def test_nonexistent_id_returns_404():
+    resp = client.get("/habits/9999")
+    assert resp.status_code == 404
+    data = resp.json()
+    assert data["detail"] == "Habit not found"
