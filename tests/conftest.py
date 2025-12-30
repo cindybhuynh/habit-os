@@ -1,5 +1,5 @@
 import pytest
-import app.routers.habits as habits_module
+import app.services.habits as habits_module
 
 @pytest.fixture(autouse=True)
 def reset_habits_store():
