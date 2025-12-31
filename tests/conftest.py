@@ -1,7 +1,10 @@
 import pytest
-import app.services.habits as habits_module
+from app.main import app
+from app.services.habits import HabitStore, get_store
 
 @pytest.fixture(autouse=True)
-def reset_habits_store():
-    habits_module.HABITS.clear()
-    habits_module.NEXT_ID = 1
+def override_store_dependency():
+    test_store = HabitStore()
+    app.dependency_overrides[get_store] = lambda: test_store
+    yield
+    app.dependency_overrides.clear()
