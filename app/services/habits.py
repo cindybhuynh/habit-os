@@ -1,24 +1,30 @@
 # app/services/habits.py
 from fastapi import Depends
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.models.habit import Habit
 from app.schemas.habit import HabitCreate, HabitRead
 
 class HabitStore:
     def __init__(self, db: Session):
         self.db = db
 
-    # For now, these are placeholders until you add a SQLAlchemy Habit model.
-    # Once you have app/models/habit.py, you'll implement real CRUD here.
     def create_habit(self, habit_in: HabitCreate) -> HabitRead:
-        raise NotImplementedError("Implement DB-backed create_habit after adding Habit SQLAlchemy model")
+        habit = Habit(**habit_in.model_dump())
+        self.db.add(habit)
+        self.db.commit()
+        self.db.refresh(habit)
+        return HabitRead.model_validate(habit)
 
     def list_habits(self) -> list[HabitRead]:
-        raise NotImplementedError("Implement DB-backed list_habits after adding Habit SQLAlchemy model")
+        habits = self.db.execute(select(Habit).order_by(Habit.id)).scalars().all()
+        return [HabitRead.model_validate(h) for h in habits]
 
     def get_habit(self, habit_id: int) -> HabitRead | None:
-        raise NotImplementedError("Implement DB-backed get_habit after adding Habit SQLAlchemy model")
+        habit = self.db.get(Habit, habit_id)
+        return HabitRead.model_validate(habit) if habit else None
 
 def get_store(db: Session = Depends(get_db)) -> HabitStore:
     return HabitStore(db)
