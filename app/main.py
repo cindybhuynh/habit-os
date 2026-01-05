@@ -4,6 +4,7 @@ from app.routers.habits import router as habits_router
 from app.routers.users import router as users_router
 from app.db.init_db import init_db
 
+
 app = FastAPI(
     title="HabitOS",
     version="0.1.0",

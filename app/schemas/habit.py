@@ -1,6 +1,9 @@
+# app/schemas/habit.py
 from datetime import date
 from typing import Optional, Literal
+
 from pydantic import BaseModel, Field, ConfigDict
+
 
 class HabitCreate(BaseModel):
     name: str = Field(min_length=1)
@@ -9,7 +12,12 @@ class HabitCreate(BaseModel):
     start_date: date
     notes: Optional[str] = None
 
+
 class HabitRead(BaseModel):
+    """
+    Response schema. from_attributes=True lets Pydantic build this schema
+    from a SQLAlchemy ORM object (Habit) directly.
+    """
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -18,4 +26,4 @@ class HabitRead(BaseModel):
     target_count: int
     start_date: date
     notes: Optional[str] = None
-# Note: You can add HabitUpdate later if you want to support updating habits.
+    

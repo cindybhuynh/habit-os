@@ -1,10 +1,16 @@
 # app/models/habit.py
-from sqlalchemy import CheckConstraint, Date, Integer, String, Text
+from datetime import date
+
+from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
+
 class Habit(Base):
+    """
+    ORM model representing the 'habits' table in PostgreSQL.
+    """
     __tablename__ = "habits"
 
     __table_args__ = (
@@ -12,9 +18,9 @@ class Habit(Base):
         CheckConstraint("schedule_type IN ('daily', 'weekly')", name="ck_habits_schedule_type_valid"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
-    schedule_type: Mapped[str] = mapped_column(String(10), nullable=False)
-    target_count: Mapped[int] = mapped_column(Integer, nullable=False)
-    start_date: Mapped[object] = mapped_column(Date, nullable=False)  # date
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(nullable=False)
+    schedule_type: Mapped[str] = mapped_column(nullable=False)  # 'daily' or 'weekly'
+    target_count: Mapped[int] = mapped_column(nullable=False)
+    start_date: Mapped[date] = mapped_column(nullable=False)
+    notes: Mapped[str | None] = mapped_column(nullable=True)
