@@ -1,14 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.schemas.habit import HabitCreate, HabitRead
-from app.services.habits import HabitStore, get_store
+from app.services.habits import HabitStore, get_store, HabitAlreadyExistsError
 
 router = APIRouter(prefix="/habits", tags=["habits"])
 
 @router.post("", response_model=HabitRead, status_code=201)
 def create_habit(habit_in: HabitCreate, store: HabitStore = Depends(get_store)):
-    return store.create_habit(habit_in)
+    try:
+        return store.create_habit(habit_in)
+    except HabitAlreadyExistsError:
+        raise HTTPException(status_code=409, detail="Habit already exists")
 
-@router.get("", response_model=list[HabitRead])
+@router.get("", response_model=list[HabitRead], response_model_exclude_none=True)
 def list_habits(store: HabitStore = Depends(get_store)):
     return store.list_habits()
 

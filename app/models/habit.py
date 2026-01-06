@@ -19,7 +19,7 @@ class Habit(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
     schedule_type: Mapped[str] = mapped_column(nullable=False)  # 'daily' or 'weekly'
     target_count: Mapped[int] = mapped_column(nullable=False)
     start_date: Mapped[date] = mapped_column(nullable=False)

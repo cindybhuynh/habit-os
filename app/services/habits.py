@@ -1,6 +1,7 @@
 # app/services/habits.py
 from fastapi import Depends
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -8,21 +9,28 @@ from app.models.habit import Habit
 from app.schemas.habit import HabitCreate, HabitRead
 
 
+class HabitAlreadyExistsError(Exception):
+    pass
+
+
 class HabitStore:
     """
-    Service layer for Habit operations.
-    Holds a SQLAlchemy Session injected by FastAPI.
+    Service layer for Habit operations (DB logic only).
     """
     def __init__(self, db: Session):
         self.db = db
 
     def create_habit(self, habit_in: HabitCreate) -> HabitRead:
         habit = Habit(**habit_in.model_dump())
-
         self.db.add(habit)
-        self.db.commit()
-        self.db.refresh(habit)  # populate habit.id from DB
 
+        try:
+            self.db.commit()
+        except IntegrityError as e:
+            self.db.rollback()
+            raise HabitAlreadyExistsError() from e
+
+        self.db.refresh(habit)
         return HabitRead.model_validate(habit)
 
     def list_habits(self) -> list[HabitRead]:
@@ -35,7 +43,4 @@ class HabitStore:
 
 
 def get_store(db: Session = Depends(get_db)) -> HabitStore:
-    """
-    FastAPI dependency that injects a DB session into the HabitStore.
-    """
     return HabitStore(db)

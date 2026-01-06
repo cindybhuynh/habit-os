@@ -4,6 +4,6 @@ from app.main import app
 client = TestClient(app)
 
 def test_health_returns_healthy():
-    resp = client.get("/health")
-    assert resp.status_code == 200
-    assert resp.json() == {"status": "healthy"}
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json() == {"status": "healthy"}
