@@ -8,6 +8,8 @@ from alembic import context
 from app.core.config import settings
 from app.db.base import Base
 import app.models.habit  # noqa: F401
+import app.models.completion  # noqa: F401
+
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

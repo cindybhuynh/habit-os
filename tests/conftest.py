@@ -1,25 +1,29 @@
-# tests/conftest.py
 import os
 import pytest
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-from app.main import app
+load_dotenv()
+
+from app.main import app as fastapi_app
 from app.db.base import Base
 from app.db.session import get_db
 
-TEST_DATABASE_URL = os.getenv(
-    "DATABASE_URL_TEST",
-    "postgresql+psycopg://habitos:supersecretpassword@localhost:5432/habitos_test",
-)
+# IMPORTANT: import models so Base.metadata knows about them
+from app.models import habit  # noqa: F401
+from app.models import completion  # noqa: F401
+
+TEST_DATABASE_URL = os.getenv("DATABASE_URL_TEST")
+if not TEST_DATABASE_URL:
+    raise RuntimeError("DATABASE_URL_TEST is not set")
 
 engine = create_engine(TEST_DATABASE_URL, pool_pre_ping=True, future=True)
 TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 
 @pytest.fixture(scope="session", autouse=True)
 def create_test_schema():
-    # Create tables once for the test session
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     yield
@@ -27,9 +31,8 @@ def create_test_schema():
 
 @pytest.fixture(autouse=True)
 def clean_db():
-    # Clean rows before each test (keeps schema)
     with engine.connect() as conn:
-        conn.execute(text("TRUNCATE TABLE habits RESTART IDENTITY CASCADE;"))
+        conn.execute(text("TRUNCATE TABLE habit_completions, habits RESTART IDENTITY CASCADE;"))
         conn.commit()
     yield
 
@@ -42,7 +45,7 @@ def client():
         finally:
             db.close()
 
-    app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as c:
+    fastapi_app.dependency_overrides[get_db] = override_get_db
+    with TestClient(fastapi_app) as c:
         yield c
-    app.dependency_overrides.clear()
+    fastapi_app.dependency_overrides.clear()
