@@ -62,3 +62,14 @@ def test_validation_count_zero(client):
         "notes": "Felt great!",
     })
     assert r.status_code == 422
+
+def test_duplicate_completion_same_day_returns_409(client):
+    habit_id = _create_habit(client)
+    payload = {"done_on": "2026-01-07", "count": 1, "notes": None}
+
+    r1 = client.post(f"/habits/{habit_id}/completions", json=payload)
+    assert r1.status_code == 201
+
+    r2 = client.post(f"/habits/{habit_id}/completions", json=payload)
+    assert r2.status_code == 409
+    assert r2.json()["detail"] == "Completion already exists"
