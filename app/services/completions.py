@@ -2,6 +2,7 @@
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.db.session import get_db
 from app.models.habit import Habit
@@ -10,6 +11,10 @@ from app.schemas.completion import CompletionCreate, CompletionRead
 
 
 class HabitNotFoundError(Exception):
+    pass
+
+
+class CompletionAlreadyExistsError(Exception):
     pass
 
 
@@ -22,12 +27,38 @@ class CompletionStore:
         if habit is None:
             raise HabitNotFoundError()
 
+        # App-level guard (nice error before hitting DB)
+        existing = (
+            self.db.execute(
+                select(HabitCompletion.id).where(
+                    HabitCompletion.habit_id == habit_id,
+                    HabitCompletion.done_on == completion_in.done_on,
+                )
+            )
+            .scalar_one_or_none()
+        )
+        if existing is not None:
+            raise CompletionAlreadyExistsError()
+
         completion = HabitCompletion(
             habit_id=habit_id,
             **completion_in.model_dump(),
         )
         self.db.add(completion)
-        self.db.commit()
+
+        try:
+            self.db.commit()
+        except IntegrityError as e:
+            self.db.rollback()
+
+            # If the DB unique constraint triggered, map to 409
+            constraint = getattr(getattr(e.orig, "diag", None), "constraint_name", None)
+            if constraint == "uq_completion_habit_day":
+                raise CompletionAlreadyExistsError() from e
+
+            # Otherwise it's a different integrity problem; re-raise
+            raise
+
         self.db.refresh(completion)
         return CompletionRead.model_validate(completion)
 

@@ -9,6 +9,7 @@ class CompletionCreate(BaseModel):
     done_on: date
     count: int = Field(ge=1, le=1000)
     notes: Optional[str] = Field(default=None, max_length=2000)
+    model_config = ConfigDict(extra="forbid")
 
 
 class CompletionRead(BaseModel):
