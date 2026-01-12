@@ -27,23 +27,7 @@ class CompletionStore:
         if habit is None:
             raise HabitNotFoundError()
 
-        # App-level guard (nice error before hitting DB)
-        existing = (
-            self.db.execute(
-                select(HabitCompletion.id).where(
-                    HabitCompletion.habit_id == habit_id,
-                    HabitCompletion.done_on == completion_in.done_on,
-                )
-            )
-            .scalar_one_or_none()
-        )
-        if existing is not None:
-            raise CompletionAlreadyExistsError()
-
-        completion = HabitCompletion(
-            habit_id=habit_id,
-            **completion_in.model_dump(),
-        )
+        completion = HabitCompletion(habit_id=habit_id, **completion_in.model_dump())
         self.db.add(completion)
 
         try:
@@ -51,13 +35,11 @@ class CompletionStore:
         except IntegrityError as e:
             self.db.rollback()
 
-            # If the DB unique constraint triggered, map to 409
             constraint = getattr(getattr(e.orig, "diag", None), "constraint_name", None)
             if constraint == "uq_completion_habit_day":
                 raise CompletionAlreadyExistsError() from e
 
-            # Otherwise it's a different integrity problem; re-raise
-            raise
+            raise  # if it's some other IntegrityError
 
         self.db.refresh(completion)
         return CompletionRead.model_validate(completion)
