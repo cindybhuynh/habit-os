@@ -1,3 +1,4 @@
+#app/schemas/habit.py
 from datetime import date
 from typing import Optional, Literal
 
@@ -29,3 +30,8 @@ class HabitRead(BaseModel):
     target_count: int
     start_date: date
     notes: Optional[str] = None
+
+class HabitReadWithStatus(HabitRead):
+    completed_on_date: bool
+    completion_count_on_date: int
+    date: date
