@@ -26,7 +26,7 @@ def create_completion(
         raise HTTPException(status_code=409, detail="Completion already exists")
 
 
-@router.get("", response_model=list[CompletionRead], response_model_exclude_none=True)
+@router.get("", response_model=list[CompletionRead], response_model_exclude_none=True, status_code=200)
 def list_completions(
     habit_id: int,
     store: CompletionStore = Depends(get_completion_store),
