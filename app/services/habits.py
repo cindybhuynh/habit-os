@@ -55,46 +55,36 @@ class HabitStore:
         return True
 
     def list_habits_with_status(self, for_date: dt_date | None = None) -> list[HabitReadWithStatus]:
-        """
-        Returns habits enriched with completion status for the given date.
-        One completion per habit per day => completion_count_on_date is 0 or 1.
-        """
-        day = for_date or dt_date.today()
+        if for_date is None:
+            for_date = dt_date.today()
 
-        # Load all habits
-        habits = self.db.execute(select(Habit).order_by(Habit.id)).scalars().all()
-        if not habits:
-            return []
-
-        habit_ids = [h.id for h in habits]
-
-        # Fetch completions for that day for these habits
-        completed_ids = set(
-            self.db.execute(
-                select(HabitCompletion.habit_id)
-                .where(HabitCompletion.done_on == day)
-                .where(HabitCompletion.habit_id.in_(habit_ids))
-            ).scalars().all()
+        stmt = (
+            select(Habit, HabitCompletion)
+            .outerjoin(
+                HabitCompletion,
+                (HabitCompletion.habit_id == Habit.id) & (HabitCompletion.done_on == for_date),
+            )
+            .order_by(Habit.id)
         )
 
-        # Build response objects
-        result: list[HabitReadWithStatus] = []
-        for h in habits:
-            done = h.id in completed_ids
-            result.append(
+        rows = self.db.execute(stmt).all()
+
+        results: list[HabitReadWithStatus] = []
+        for habit, completion in rows:
+            results.append(
                 HabitReadWithStatus(
-                    id=h.id,
-                    name=h.name,
-                    schedule_type=h.schedule_type,
-                    target_count=h.target_count,
-                    start_date=h.start_date,
-                    notes=h.notes,
-                    completed_on_date=done,
-                    completion_count_on_date=1 if done else 0,
-                    date=day,
+                    id=habit.id,
+                    name=habit.name,
+                    schedule_type=habit.schedule_type,
+                    target_count=habit.target_count,
+                    start_date=habit.start_date,
+                    notes=habit.notes,
+                    completed_on_date=(completion is not None),
+                    completion_count_on_date=(completion.count if completion is not None else 0),
+                    date=for_date,
                 )
             )
-        return result
+        return results
 
 
 def get_store(db: Session = Depends(get_db)) -> HabitStore:
