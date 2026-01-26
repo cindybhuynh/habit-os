@@ -16,16 +16,16 @@ def create_habit(habit_in: HabitCreate, store: HabitStore = Depends(get_store)):
         raise HTTPException(status_code=409, detail="Habit already exists")
 
 
-@router.get("", response_model=list[HabitRead] | list[HabitReadWithStatus], response_model_exclude_none=True)
-def list_habits(
+@router.get("", response_model=list[HabitRead], response_model_exclude_none=True)
+def list_habits(store: HabitStore = Depends(get_store)):
+    return store.list_habits()
+
+
+@router.get("/status", response_model=list[HabitReadWithStatus], response_model_exclude_none=True)
+def list_habits_status(
     store: HabitStore = Depends(get_store),
-    include_status: bool = Query(False, description="Include completion status for a given date"),
     for_date: dt_date | None = Query(None, description="Date to compute completion status for (defaults to today)"),
 ):
-    # If not requested, return the plain habits list
-    if not include_status:
-        return store.list_habits()
-
     return store.list_habits_with_status(for_date=for_date)
 
 
