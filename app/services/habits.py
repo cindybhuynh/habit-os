@@ -58,33 +58,37 @@ class HabitStore:
         if for_date is None:
             for_date = dt_date.today()
 
-        stmt = (
-            select(Habit, HabitCompletion)
-            .outerjoin(
-                HabitCompletion,
-                (HabitCompletion.habit_id == Habit.id) & (HabitCompletion.done_on == for_date),
+        habits = self.db.execute(select(Habit).order_by(Habit.id)).scalars().all()
+
+        completions = (
+            self.db.execute(
+                select(HabitCompletion)
+                .where(HabitCompletion.done_on == for_date)
             )
-            .order_by(Habit.id)
+            .scalars()
+            .all()
         )
 
-        rows = self.db.execute(stmt).all()
+        # Build map: habit_id -> completion
+        completion_by_habit_id = {c.habit_id: c for c in completions}
 
-        results: list[HabitReadWithStatus] = []
-        for habit, completion in rows:
-            results.append(
+        result: list[HabitReadWithStatus] = []
+        for h in habits:
+            c = completion_by_habit_id.get(h.id)
+            result.append(
                 HabitReadWithStatus(
-                    id=habit.id,
-                    name=habit.name,
-                    schedule_type=habit.schedule_type,
-                    target_count=habit.target_count,
-                    start_date=habit.start_date,
-                    notes=habit.notes,
-                    completed_on_date=(completion is not None),
-                    completion_count_on_date=(completion.count if completion is not None else 0),
+                    id=h.id,
+                    name=h.name,
+                    schedule_type=h.schedule_type,
+                    target_count=h.target_count,
+                    start_date=h.start_date,
+                    notes=h.notes,
+                    completed_on_date=(c is not None),
+                    completion_count_on_date=(c.count if c else 0),
                     date=for_date,
                 )
             )
-        return results
+        return result
 
 
 def get_store(db: Session = Depends(get_db)) -> HabitStore:
