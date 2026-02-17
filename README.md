@@ -20,4 +20,5 @@ It supports managing habits and related daily activity records (e.g., completion
 ---
 
 ## Project Structure (high level)
-
+### Dependency Injection
+Each request to the database gets its own isolated database connection so that the code remains modular and easier to test.
