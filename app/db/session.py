@@ -28,7 +28,7 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()
+        db.close() # always closes, even if request crashes 
 
 @contextmanager
 def db_session():
