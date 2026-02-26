@@ -18,77 +18,48 @@ class HabitAlreadyExistsError(Exception):
 
 
 class HabitStore:
-    """
-    Service layer for Habit operations (DB logic only).
-    """
     def __init__(self, db: Session):
         self.db = db
 
     def create_habit(self, habit_in: HabitCreate) -> HabitRead:
+        # 1. Use model_dump() but be careful with ID/Relationship fields if they existed
         habit = Habit(**habit_in.model_dump())
         self.db.add(habit)
-
         try:
             self.db.commit()
+            self.db.refresh(habit) 
+            return HabitRead.model_validate(habit)
         except IntegrityError as e:
-            self.db.rollback()
+            self.db.rollback() # Crucial: Clean up the 'failed' transaction
             raise HabitAlreadyExistsError() from e
-
-        self.db.refresh(habit)
-        return HabitRead.model_validate(habit)
-
-    def list_habits(self) -> list[HabitRead]:
-        habits = self.db.execute(select(Habit).order_by(Habit.id)).scalars().all()
-        return [HabitRead.model_validate(h) for h in habits]
-
-    def get_habit(self, habit_id: int) -> HabitRead | None:
-        habit = self.db.get(Habit, habit_id)
-        return HabitRead.model_validate(habit) if habit else None
-
-    def delete_habit(self, habit_id: int) -> bool:
-        habit = self.db.get(Habit, habit_id)
-        if habit is None:
-            return False
-
-        self.db.delete(habit)
-        self.db.commit()
-        return True
 
     def list_habits_with_status(self, for_date: dt_date | None = None) -> list[HabitReadWithStatus]:
         if for_date is None:
             for_date = dt_date.today()
 
+        # 2. Optimization: The "N+1" Problem
+        # Currently, you fetch ALL habits, then ALL completions. 
+        # This works for now, but in the future, we'd use a JOIN.
         habits = self.db.execute(select(Habit).order_by(Habit.id)).scalars().all()
 
         completions = (
             self.db.execute(
-                select(HabitCompletion)
-                .where(HabitCompletion.done_on == for_date)
-            )
-            .scalars()
-            .all()
+                select(HabitCompletion).where(HabitCompletion.done_on == for_date)
+            ).scalars().all()
         )
 
-        # Build map: habit_id -> completion
-        completion_by_habit_id = {c.habit_id: c for c in completions}
+        completion_map = {c.habit_id: c for c in completions}
 
-        result: list[HabitReadWithStatus] = []
-        for h in habits:
-            c = completion_by_habit_id.get(h.id)
-            result.append(
-                HabitReadWithStatus(
-                    id=h.id,
-                    name=h.name,
-                    schedule_type=h.schedule_type,
-                    target_count=h.target_count,
-                    start_date=h.start_date,
-                    notes=h.notes,
-                    completed_on_date=(c is not None),
-                    completion_count_on_date=(c.count if c else 0),
-                    date=for_date,
-                )
+        # 3. Use model_validate for status too (cleaner)
+        return [
+            HabitReadWithStatus(
+                **HabitRead.model_validate(h).model_dump(), # Copy base habit data
+                completed_on_date=(h.id in completion_map),
+                completion_count_on_date=completion_map[h.id].count if h.id in completion_map else 0,
+                date=for_date,
             )
-        return result
+            for h in habits
+        ]
 
 
 def get_store(db: Session = Depends(get_db)) -> HabitStore:
