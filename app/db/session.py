@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 from app.core.config import settings  # assumes you have settings.DATABASE_URL
 
@@ -21,14 +21,15 @@ SessionLocal = sessionmaker(
 )
 
 def get_db():
-    """
-    FastAPI-style dependency (or just a generator you can use elsewhere).
-    """
-    db = SessionLocal()
+    db: Session = SessionLocal()
     try:
         yield db
+        db.commit()       # ← commit if no exception was raised
+    except Exception:
+        db.rollback()     # ← rollback on any error
+        raise             # ← re-raise so FastAPI returns the right status code
     finally:
-        db.close() # always closes, even if request crashes 
+        db.close()        # ← always close the connection
 
 @contextmanager
 def db_session():
