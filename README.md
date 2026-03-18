@@ -13,16 +13,7 @@ migrations, and a pytest test suite.
 
 I'm deeply interested in the intersection between computer science and psychology. 
 Specifically in areas of self improvement and building small but compounding habits.
-Habit tracking felt like the perfect project to start, and building it myself meant understanding the data and software behind an app.
-
-After taking Algorithm Design I at the University of Missouri, 
-I understood the fundamentals of C but I hadn't built a complex project using a clean tech stack. 
-So I decided to build HabitOS, with APIs, code tests, and a real database. 
-Habit tracking was a great starting point, teaching me about alembic migrations and dependency injections.
-
-To be honest, there were parts of my code that I didn't fully understand. 
-I spent hours trying to understand Alembic migrations conflicts and connect Docker with PostgreSQL.
-I worked through it by using documentation on Alembic and a lot of trial and error.
+After taking Algorithm Design I at the University of Missouri, I understood C fundamentals but I hadn't built anything with a real tech stack. HabitOS was my way of building APIs, tests, a real database, and using project-based learning to simulate a real world setting.
 
 ---
 
@@ -38,17 +29,17 @@ I worked through it by using documentation on Alembic and a lot of trial and err
 
 ---
 
-## Project Structure (high level)
-
-### Local Development
+## Getting Started
 1. Create venv: `python -m venv .venv`
 2. Activate: `source .venv/bin/activate`
 3. Install: `pip install -r requirements.txt`
 4. Run: `uvicorn app.main:app --reload`
 
-### Dependency Injection
-Each request gets its own isolated database session so the code stays modular
-and testable without shared state leaking between requests.
+For Docker:
+```
+docker-compose up -d
+```
+API available at `http://localhost:8000/docs`
 
 ---
 
@@ -60,10 +51,7 @@ sync. I learned to treat migration history as append-only and stopped trying to
 edit existing migration files to fix mistakes.
 
 **Docker networking** — Getting FastAPI and PostgreSQL to communicate inside 
-docker-compose required understanding how to set up all of the systems to ensure that
-everything was running properly. If Docker wasn't running or my connection was incorrect,
-FastAPI wouldn't reach the PostgreSQL container entirely. Then I would get confusing error messages that didn't 
-always address the root cause. Afterwards, I learned how to debug by testing and changing my approach.
+docker-compose meant understanding that containers are isolated. When my connection string pointed to localhost instead of the Docker service name, FastAPI couldn't reach Postgres, and the error messages pointed to the database rather than the network configuration. I learned to trace connectivity issues from the container, rather than taking error messages at face value.
 
 **Understanding my own code** — The hardest problem isn't technical. SQLAlchemy 
 sessions, Alembic's migration graph, and FastAPI's dependency injection system 
@@ -75,20 +63,16 @@ Sometimes that means sitting with confusion longer than feels comfortable.
 
 ## What's Next
 
-My current priority is completing the backend with full test coverage before
-starting the frontend. I want to have a solid foundation and understanding before 
-adding other features.
+I'm currently building outward from a working backend toward a complete, deployable full-stack app.
 
 Planned in order:
 
-1. **Analytics endpoints** — streaks, completion rates, and date-range trend 
-   queries. This is where the PostgreSQL schema design starts to pay off.
-3. **Frontend / dashboard** — A simple UI to make habit data visible and 
-   interactive. The analytics layer needs to exist first for this to be 
-   meaningful.
-4. **Authentication** — JWT-based user accounts so the API can support multiple 
+1. **Frontend / dashboard** — A simple React UI for viewing, creating, and completing habits. Making the data visible and interactive first, so every backend feature added has a user-facing impact.
+2. **Authentication** — JWT-based user accounts so the API can support multiple 
    users with isolated data.
-5. **ML-based recommendations** — Pattern detection on habit completion data 
-   to surface insights (e.g., which habits correlate with streak success). 
-   The long-term goal is using the habit data to spot behavioral patterns,
-   which is what the ML recommendations are designed for.
+3. **Analytics endpoints** — streaks, completion rates, and date-range trend 
+   queries on the dashboard.
+4. **ML-based recommendations** — Pattern detection on habit completion data 
+   to identify which habits correlate with streak success. The long-term goal is using the
+   habit data to spot behavioral patterns, connecting to my interest in neuroscience and
+   behavioral AI.
