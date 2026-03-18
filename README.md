@@ -81,13 +81,13 @@ adding other features.
 
 Planned in order:
 
-1. **Analytics endpoints** — streaks, completion rates, and date-range trend 
-   queries. This is where the PostgreSQL schema design starts to pay off.
-2. **Authentication** — JWT-based user accounts so the API can support multiple 
-   users with isolated data.
-3. **Frontend / dashboard** — A simple UI to make habit data visible and 
+1. **Frontend / dashboard** — A simple UI to make habit data visible and 
    interactive. The analytics layer needs to exist first for this to be 
    meaningful.
+2. **Analytics endpoints** — streaks, completion rates, and date-range trend 
+   queries. This is where the PostgreSQL schema design starts to pay off.
+3. **Authentication** — JWT-based user accounts so the API can support multiple 
+   users with isolated data.
 4. **ML-based recommendations** — Pattern detection on habit completion data 
    to surface insights (e.g., which habits correlate with streak success). 
    The long-term goal is using the habit data to spot behavioral patterns,
