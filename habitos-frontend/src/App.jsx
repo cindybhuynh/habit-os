@@ -4,9 +4,14 @@ import './App.css'
 function App() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const handleSubmit = () => {
-    console.log('Email:', email)
-    console.log('Password:', password)
+  const handleSubmit = async () => {
+    try {
+        const response = await fetch('http://localhost:8000/habits')
+        const data = await response.json()
+        console.log('Habits from backend:', data)
+    } catch (error) {
+        console.log('Error connecting to backend:', error)
+    }
   }
   return (
     <div className="login-container">

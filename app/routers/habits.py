@@ -18,7 +18,7 @@ def create_habit(habit_in: HabitCreate, store: HabitStore = Depends(get_store)):
 
 @router.get("", response_model=list[HabitRead], response_model_exclude_none=True)
 def list_habits(store: HabitStore = Depends(get_store)):
-    return store.list_habits()
+    return store.list_habits_with_status()
 
 
 @router.get("/status", response_model=list[HabitReadWithStatus], response_model_exclude_none=True)
