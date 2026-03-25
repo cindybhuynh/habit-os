@@ -7,6 +7,9 @@ migrations, and a pytest test suite.
 
 > Status: Active development (v1).
 
+![HabitOS Login](screenshots/login.png)
+![HabitOS Dashboard](screenshots/dashboard.png)
+
 ---
 
 ## Why I Built This
