@@ -102,3 +102,43 @@ body {
   margin-bottom: 4px;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.create-habit-form {
+  font-size: 14px;
+  color: #e2e8f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.create-habit-form input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #25263b;
+  color: #e2e8f0;
+}
+
+.create-habit-form button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #2b3ee6;
+  color: white;
+}
+
+.create-habit-form select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #25263b;
+  color: #e2e8f0;
+}
