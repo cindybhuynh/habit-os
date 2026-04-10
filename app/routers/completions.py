@@ -1,5 +1,6 @@
 # app/routers/completions.py
 from fastapi import APIRouter, Depends, HTTPException
+from datetime import date
 
 from app.schemas.completion import CompletionCreate, CompletionRead
 from app.services.completions import (
@@ -33,5 +34,17 @@ def list_completions(
 ):
     try:
         return store.list_completions(habit_id)
+    except HabitNotFoundError:
+        raise HTTPException(status_code=404, detail="Habit not found")
+
+@router.post("/toggle/{for_date}")
+def toggle_completion(
+    habit_id: int,
+    for_date: date,
+    store: CompletionStore = Depends(get_completion_store),
+):
+    try:
+        completed = store.toggle_completion(habit_id, for_date)
+        return {"completed": completed}
     except HabitNotFoundError:
         raise HTTPException(status_code=404, detail="Habit not found")

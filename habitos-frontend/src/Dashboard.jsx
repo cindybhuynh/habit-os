@@ -45,6 +45,18 @@ function Dashboard() {
             console.log('Error creating habit:', error)
         }
     }
+    const toggleHabit = async (habitId) => {
+        const today = new Date().toISOString().split('T')[0];
+        const res = await fetch(
+            `http://localhost:8000/habits/${habitId}/completions/toggle/${today}`,
+            { method: 'POST' }
+        );
+        const data = await res.json();
+        // Update the habit's completed status in your state
+        setHabits(prev => prev.map(h => 
+            h.id === habitId ? { ...h, completed: data.completed } : h
+        ));
+    };
     return(
         <div className='dashboard'>
             <h1>Dashboard</h1>
@@ -83,6 +95,11 @@ function Dashboard() {
             </div>
             {habits.map((habit) => (
                 <div key={habit.id} className="habit-card">
+                    <input 
+                        type="checkbox" 
+                        checked={habit.completed || false} 
+                        onChange={() => toggleHabit(habit.id)} 
+                    />
                     <h2>{habit.name}</h2>
                     <p>{habit.schedule_type} · Target: {habit.target_count}</p>
                     {habit.notes && <p>{habit.notes}</p>}

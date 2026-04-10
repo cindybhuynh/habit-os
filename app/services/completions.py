@@ -3,6 +3,7 @@ from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from datetime import date
 
 from app.db.session import get_db
 from app.models.habit import Habit
@@ -59,6 +60,30 @@ class CompletionStore:
             .all()
         )
         return [CompletionRead.model_validate(r) for r in rows]
+    
+    def toggle_completion(self, habit_id: int, for_date: date) -> bool:
+        habit = self.db.get(Habit, habit_id)
+        if habit is None:
+            raise HabitNotFoundError()
+
+        existing = (
+            self.db.execute(
+                select(HabitCompletion)
+                .where(HabitCompletion.habit_id == habit_id)
+                .where(HabitCompletion.done_on == for_date)
+            )
+            .scalar_one_or_none()
+        )
+
+        if existing:
+            self.db.delete(existing)
+            self.db.commit()
+            return False   # habit is now NOT completed for this date
+        else:
+            completion = HabitCompletion(habit_id=habit_id, done_on=for_date)
+            self.db.add(completion)
+            self.db.commit()
+            return True    # habit is now completed for this date
 
 
 def get_completion_store(db: Session = Depends(get_db)) -> CompletionStore:
