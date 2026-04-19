@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.db.base import Base
 import app.models.habit  # noqa: F401
 import app.models.completion  # noqa: F401
+import app.models.user # noqa: F401
 
 
 config = context.config
