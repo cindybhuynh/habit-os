@@ -1,10 +1,10 @@
 # app/core/config.py
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict # Pydantic extension for configuration
 
 class Settings(BaseSettings):
-    DATABASE_URL: str
-    SECRET_KEY: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    DATABASE_URL: str # no default
+    SECRET_KEY: str # no default
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 # expires after 30 mins
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -13,3 +13,5 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+# app shouldn't run w/o DB URL or signing key

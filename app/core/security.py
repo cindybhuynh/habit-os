@@ -36,13 +36,13 @@ def create_access_token(user_id: int) -> str:
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_access_token(token: str) -> int | None:
+def decode_access_token(token: str) -> int | None: # returns an int (user_id_str) or None
     """
     Decode a JWT token and return the user_id.
     Returns None if the token is invalid, expired, or tampered with.
     """
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM]) # checks if token is tampered with, expired, and decodes payload
         user_id_str = payload.get("sub")
         if user_id_str is None:
             return None
