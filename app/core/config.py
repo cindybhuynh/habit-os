@@ -7,11 +7,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 # expires after 30 mins
 
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
+        env_file=".env", # to read .env file
+        env_file_encoding="utf-8", # standard encoding
+        extra="ignore", # other variables in .env are ignored
     )
 
-settings = Settings()
+settings = Settings() # instantiates 
 
 # app shouldn't run w/o DB URL or signing key
