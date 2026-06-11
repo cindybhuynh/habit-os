@@ -1,8 +1,8 @@
 # app/db/base.py
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase # defines shared Base class every SQLAlchemy ORM inherits from
 
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase): # Base gains metadata object
     """
     Base class for all SQLAlchemy ORM models.
 
@@ -10,3 +10,6 @@ class Base(DeclarativeBase):
     which is used to create tables (e.g., Base.metadata.create_all()).
     """
     pass
+
+# metadata object holds schema for all tables inheriting Base
+# Alembic reads metadata to update tables
