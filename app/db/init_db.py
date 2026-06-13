@@ -5,6 +5,7 @@ from app.db.session import engine
 # Import models so they register with Base.metadata
 from app.models.habit import Habit  # noqa: F401
 from app.models.user import User # noqa: F401
+from app.models.completion import HabitCompletion # noqa: F401
 
 
 def init_db() -> None:
