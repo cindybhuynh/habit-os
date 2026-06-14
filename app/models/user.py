@@ -1,6 +1,8 @@
 # app/models/user.py
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.sql import func
+from datetime import datetime
+
+from sqlalchemy import func
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
@@ -8,7 +10,7 @@ from app.db.base import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, nullable=False, index=True)
-    hashed_password = Column(String, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())
