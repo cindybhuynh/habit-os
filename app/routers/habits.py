@@ -7,7 +7,7 @@ from app.services.habits import HabitStore, get_store, HabitAlreadyExistsError
 
 router = APIRouter(prefix="/habits", tags=["habits"])
 
-
+# creates new habit
 @router.post("", response_model=HabitRead, status_code=201)
 def create_habit(habit_in: HabitCreate, store: HabitStore = Depends(get_store)):
     try:
@@ -15,12 +15,12 @@ def create_habit(habit_in: HabitCreate, store: HabitStore = Depends(get_store)):
     except HabitAlreadyExistsError:
         raise HTTPException(status_code=409, detail="Habit already exists")
 
-
+# gets list of all habits
 @router.get("", response_model=list[HabitRead], response_model_exclude_none=True)
 def list_habits(store: HabitStore = Depends(get_store)):
     return store.list_habits_with_status()
 
-
+# gets list of habits based on date
 @router.get("/status", response_model=list[HabitReadWithStatus], response_model_exclude_none=True)
 def list_habits_status(
     store: HabitStore = Depends(get_store),
@@ -28,7 +28,7 @@ def list_habits_status(
 ):
     return store.list_habits_with_status(for_date=for_date)
 
-
+# gets habit based on habit id
 @router.get("/{habit_id}", response_model=HabitRead)
 def get_habit(habit_id: int, store: HabitStore = Depends(get_store)):
     habit = store.get_habit(habit_id)
@@ -36,7 +36,7 @@ def get_habit(habit_id: int, store: HabitStore = Depends(get_store)):
         raise HTTPException(status_code=404, detail="Habit not found")
     return habit
 
-
+# deletes habit based on habit id
 @router.delete("/{habit_id}", status_code=204)
 def delete_habit(habit_id: int, store: HabitStore = Depends(get_store)):
     if not store.delete_habit(habit_id):

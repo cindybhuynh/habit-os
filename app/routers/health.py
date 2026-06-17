@@ -8,5 +8,5 @@ router = APIRouter(prefix="/health", tags=["health"])
 
 @router.get("")
 def health(db: Session = Depends(get_db)):
-    db.execute(text("SELECT 1"))
+    db.execute(text("SELECT 1")) # ensures Docker is running
     return {"status": "healthy"}

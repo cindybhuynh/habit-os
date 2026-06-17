@@ -12,8 +12,8 @@ from app.services.completions import (
 
 router = APIRouter(prefix="/habits/{habit_id}/completions", tags=["completions"])
 
-
-@router.post("", response_model=CompletionRead, status_code=201)
+# creates a new habit completion
+@router.post("", response_model=CompletionRead, status_code=201) 
 def create_completion(
     habit_id: int,
     completion_in: CompletionCreate,
@@ -26,8 +26,8 @@ def create_completion(
     except CompletionAlreadyExistsError:
         raise HTTPException(status_code=409, detail="Completion already exists")
 
-
-@router.get("", response_model=list[CompletionRead], response_model_exclude_none=True, status_code=200)
+# gets list of all completions for one habit
+@router.get("", response_model=list[CompletionRead], response_model_exclude_none=True, status_code=200) 
 def list_completions(
     habit_id: int,
     store: CompletionStore = Depends(get_completion_store),
@@ -37,7 +37,8 @@ def list_completions(
     except HabitNotFoundError:
         raise HTTPException(status_code=404, detail="Habit not found")
 
-@router.post("/toggle/{for_date}")
+# toggles completion state for one habit
+@router.post("/toggle/{for_date}") 
 def toggle_completion(
     habit_id: int,
     for_date: date,
