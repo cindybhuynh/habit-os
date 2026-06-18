@@ -5,15 +5,15 @@ from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class CompletionCreate(BaseModel):
+class CompletionCreate(BaseModel): # defines completion creation data
     done_on: date
     count: int = Field(ge=1, le=1000)
     notes: Optional[str] = Field(default=None, max_length=2000)
     model_config = ConfigDict(extra="forbid")
 
 
-class CompletionRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class CompletionRead(BaseModel): # defines reading completion data
+    model_config = ConfigDict(from_attributes=True) # connects schema to ORM models
 
     id: int
     habit_id: int
