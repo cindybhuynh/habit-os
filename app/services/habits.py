@@ -22,24 +22,34 @@ class HabitStore:
         self.db = db
 
     def create_habit(self, habit_in: HabitCreate) -> HabitRead:
-        # 1. Use model_dump() but be careful with ID/Relationship fields if they existed
         habit = Habit(**habit_in.model_dump())
         self.db.add(habit)
         try:
-            self.db.commit()
-            self.db.refresh(habit) 
+            self.db.flush()
+            self.db.refresh(habit)
             return HabitRead.model_validate(habit)
         except IntegrityError as e:
-            self.db.rollback() # Crucial: Clean up the 'failed' transaction
+            self.db.rollback()
             raise HabitAlreadyExistsError() from e
+
+    def get_habit(self, habit_id: int) -> HabitRead | None:
+        habit = self.db.get(Habit, habit_id)
+        if habit is None:
+            return None
+        return HabitRead.model_validate(habit)
+
+    def delete_habit(self, habit_id: int) -> bool:
+        habit = self.db.get(Habit, habit_id)
+        if habit is None:
+            return False
+        self.db.delete(habit)
+        self.db.flush()
+        return True
 
     def list_habits_with_status(self, for_date: dt_date | None = None) -> list[HabitReadWithStatus]:
         if for_date is None:
             for_date = dt_date.today()
 
-        # 2. Optimization: The "N+1" Problem
-        # Currently, you fetch ALL habits, then ALL completions. 
-        # This works for now, but in the future, we'd use a JOIN.
         habits = self.db.execute(select(Habit).order_by(Habit.id)).scalars().all()
 
         completions = (
@@ -50,10 +60,9 @@ class HabitStore:
 
         completion_map = {c.habit_id: c for c in completions}
 
-        # 3. Use model_validate for status too (cleaner)
         return [
             HabitReadWithStatus(
-                **HabitRead.model_validate(h).model_dump(), # Copy base habit data
+                **HabitRead.model_validate(h).model_dump(),
                 completed_on_date=(h.id in completion_map),
                 completion_count_on_date=completion_map[h.id].count if h.id in completion_map else 0,
                 date=for_date,

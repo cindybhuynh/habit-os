@@ -32,7 +32,7 @@ class CompletionStore:
         self.db.add(completion)
 
         try:
-            self.db.commit()
+            self.db.flush()
         except IntegrityError as e:
             self.db.rollback()
 
@@ -40,7 +40,7 @@ class CompletionStore:
             if constraint == "uq_completion_habit_day":
                 raise CompletionAlreadyExistsError() from e
 
-            raise  # if it's some other IntegrityError
+            raise
 
         self.db.refresh(completion)
         return CompletionRead.model_validate(completion)
@@ -60,7 +60,7 @@ class CompletionStore:
             .all()
         )
         return [CompletionRead.model_validate(r) for r in rows]
-    
+
     def toggle_completion(self, habit_id: int, for_date: date) -> bool:
         habit = self.db.get(Habit, habit_id)
         if habit is None:
@@ -77,13 +77,13 @@ class CompletionStore:
 
         if existing:
             self.db.delete(existing)
-            self.db.commit()
-            return False   # habit is now NOT completed for this date
+            self.db.flush()
+            return False
         else:
             completion = HabitCompletion(habit_id=habit_id, done_on=for_date)
             self.db.add(completion)
-            self.db.commit()
-            return True    # habit is now completed for this date
+            self.db.flush()
+            return True
 
 
 def get_completion_store(db: Session = Depends(get_db)) -> CompletionStore:
