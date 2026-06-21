@@ -15,8 +15,8 @@ def create_habit(habit_in: HabitCreate, store: HabitStore = Depends(get_store)):
     except HabitAlreadyExistsError:
         raise HTTPException(status_code=409, detail="Habit already exists")
 
-# gets list of all habits
-@router.get("", response_model=list[HabitRead], response_model_exclude_none=True)
+# gets list of habits
+@router.get("", response_model=list[HabitReadWithStatus], response_model_exclude_none=True)
 def list_habits(store: HabitStore = Depends(get_store)):
     return store.list_habits_with_status()
 
