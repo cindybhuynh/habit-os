@@ -23,8 +23,8 @@ app = FastAPI(
 )
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    CORSMiddleware, # allows other origins to make requests
+    allow_origins=["http://localhost:5173"], # allows react app to make requests
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
