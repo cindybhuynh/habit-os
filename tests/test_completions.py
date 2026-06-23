@@ -1,4 +1,4 @@
-# tests/test_completions.py
+# app/tests/test_completions.py
 
 def _create_habit(client) -> int:
     r = client.post("/habits", json={
@@ -73,3 +73,18 @@ def test_duplicate_completion_same_day_returns_409(client):
     r2 = client.post(f"/habits/{habit_id}/completions", json=payload)
     assert r2.status_code == 409
     assert r2.json()["detail"] == "Completion already exists"
+
+def test_toggle_completion(client):
+    habit_id = _create_habit(client)
+
+    r = client.post(f"/habits/{habit_id}/completions/toggle/2026-01-06")
+    data = r.json()
+    assert data["completed"] is True
+
+    r = client.post(f"/habits/{habit_id}/completions/toggle/2026-01-06")
+    data = r.json()
+    assert data["completed"] is False
+
+    r = client.post(f"/habits/{habit_id}/completions/toggle/2026-01-06")
+    data = r.json()
+    assert data["completed"] is True
