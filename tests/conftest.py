@@ -1,3 +1,5 @@
+# app/tests/conftest.py
+
 import os
 import pytest
 from dotenv import load_dotenv
@@ -14,6 +16,7 @@ from app.db.session import get_db
 # IMPORTANT: import models so Base.metadata knows about them
 from app.models import habit  # noqa: F401
 from app.models import completion  # noqa: F401
+from app.models import user #noqa: F401
 
 TEST_DATABASE_URL = os.getenv("DATABASE_URL_TEST")
 if not TEST_DATABASE_URL:
