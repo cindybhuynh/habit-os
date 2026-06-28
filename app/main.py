@@ -7,6 +7,7 @@ from app.routers.health import router as health_router
 from app.routers.habits import router as habits_router
 from app.routers.users import router as users_router
 from app.routers.completions import router as completions_router
+from app.routers.auth import router as auth_router
 
 
 
@@ -34,3 +35,4 @@ app.include_router(health_router)
 app.include_router(habits_router)
 app.include_router(users_router)
 app.include_router(completions_router)
+app.include_router(auth_router)
