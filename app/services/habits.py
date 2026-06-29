@@ -21,8 +21,9 @@ class HabitStore:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_habit(self, habit_in: HabitCreate) -> HabitRead:
+    def create_habit(self, habit_in: HabitCreate, user_id: int) -> HabitRead:
         habit = Habit(**habit_in.model_dump())
+        habit.user_id = user_id
         self.db.add(habit)
         try:
             self.db.flush()
@@ -32,29 +33,44 @@ class HabitStore:
             self.db.rollback()
             raise HabitAlreadyExistsError() from e
 
-    def get_habit(self, habit_id: int) -> HabitRead | None:
-        habit = self.db.get(Habit, habit_id)
+    def get_habit(self, habit_id: int, user_id: int) -> HabitRead | None:
+        habit = self.db.execute(
+            select(Habit)
+            .where(Habit.id == habit_id)
+            .where(Habit.user_id == user_id)
+        ).scalar_one_or_none()
         if habit is None:
             return None
         return HabitRead.model_validate(habit)
 
-    def delete_habit(self, habit_id: int) -> bool:
-        habit = self.db.get(Habit, habit_id)
+    def delete_habit(self, habit_id: int, user_id: int) -> bool:
+        habit = self.db.execute(
+            select(Habit)
+            .where(Habit.id == habit_id)
+            .where(Habit.user_id == user_id)
+        ).scalar_one_or_none()
         if habit is None:
             return False
         self.db.delete(habit)
         self.db.flush()
         return True
 
-    def list_habits_with_status(self, for_date: dt_date | None = None) -> list[HabitReadWithStatus]:
+    def list_habits_with_status(self, user_id: int, for_date: dt_date | None = None) -> list[HabitReadWithStatus]:
         if for_date is None:
             for_date = dt_date.today()
 
-        habits = self.db.execute(select(Habit).order_by(Habit.id)).scalars().all()
+        habits = self.db.execute(
+            select(Habit)
+            .where(Habit.user_id == user_id)
+            .order_by(Habit.id)
+        ).scalars().all()
 
         completions = (
             self.db.execute(
-                select(HabitCompletion).where(HabitCompletion.done_on == for_date)
+                select(HabitCompletion)
+                .join(Habit)
+                .where(HabitCompletion.done_on == for_date)
+                .where(Habit.user_id == user_id)
             ).scalars().all()
         )
 

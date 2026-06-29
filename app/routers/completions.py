@@ -10,6 +10,9 @@ from app.services.completions import (
     CompletionAlreadyExistsError,
 )
 
+from app.models.user import User
+from app.api.deps import get_current_user
+
 router = APIRouter(prefix="/habits/{habit_id}/completions", tags=["completions"])
 
 # creates a new habit completion
@@ -18,9 +21,10 @@ def create_completion(
     habit_id: int,
     completion_in: CompletionCreate,
     store: CompletionStore = Depends(get_completion_store),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        return store.create_completion(habit_id, completion_in)
+        return store.create_completion(habit_id, completion_in, current_user.id)
     except HabitNotFoundError:
         raise HTTPException(status_code=404, detail="Habit not found")
     except CompletionAlreadyExistsError:
@@ -31,9 +35,10 @@ def create_completion(
 def list_completions(
     habit_id: int,
     store: CompletionStore = Depends(get_completion_store),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        return store.list_completions(habit_id)
+        return store.list_completions(habit_id, current_user.id)
     except HabitNotFoundError:
         raise HTTPException(status_code=404, detail="Habit not found")
 
@@ -43,9 +48,10 @@ def toggle_completion(
     habit_id: int,
     for_date: date,
     store: CompletionStore = Depends(get_completion_store),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        completed = store.toggle_completion(habit_id, for_date)
+        completed = store.toggle_completion(habit_id, for_date, current_user.id)
         return {"completed": completed}
     except HabitNotFoundError:
         raise HTTPException(status_code=404, detail="Habit not found")

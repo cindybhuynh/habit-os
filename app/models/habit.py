@@ -1,7 +1,7 @@
 # app/models/habit.py
 from datetime import date
 
-from sqlalchemy import CheckConstraint
+from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -19,6 +19,11 @@ class Habit(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
     schedule_type: Mapped[str] = mapped_column(nullable=False)  # 'daily' or 'weekly'
     target_count: Mapped[int] = mapped_column(nullable=False)

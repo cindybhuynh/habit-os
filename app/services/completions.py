@@ -23,8 +23,12 @@ class CompletionStore:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_completion(self, habit_id: int, completion_in: CompletionCreate) -> CompletionRead:
-        habit = self.db.get(Habit, habit_id)
+    def create_completion(self, habit_id: int, completion_in: CompletionCreate, user_id: int) -> CompletionRead:
+        habit = self.db.execute(
+            select(Habit)
+            .where(Habit.id == habit_id)
+            .where(Habit.user_id == user_id)
+        ).scalar_one_or_none()
         if habit is None:
             raise HabitNotFoundError()
 
@@ -45,8 +49,12 @@ class CompletionStore:
         self.db.refresh(completion)
         return CompletionRead.model_validate(completion)
 
-    def list_completions(self, habit_id: int) -> list[CompletionRead]:
-        habit = self.db.get(Habit, habit_id)
+    def list_completions(self, habit_id: int, user_id: int) -> list[CompletionRead]:
+        habit = self.db.execute(
+            select(Habit)
+            .where(Habit.id == habit_id)
+            .where(Habit.user_id == user_id)
+        ).scalar_one_or_none()
         if habit is None:
             raise HabitNotFoundError()
 
@@ -61,8 +69,12 @@ class CompletionStore:
         )
         return [CompletionRead.model_validate(r) for r in rows]
 
-    def toggle_completion(self, habit_id: int, for_date: date) -> bool:
-        habit = self.db.get(Habit, habit_id)
+    def toggle_completion(self, habit_id: int, for_date: date, user_id: int) -> bool:
+        habit = self.db.execute(
+            select(Habit)
+            .where(Habit.id == habit_id)
+            .where(Habit.user_id == user_id)
+        ).scalar_one_or_none()
         if habit is None:
             raise HabitNotFoundError()
 
