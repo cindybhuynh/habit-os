@@ -35,7 +35,7 @@ def create_test_schema():
 @pytest.fixture(autouse=True)
 def clean_db():
     with engine.connect() as conn:
-        conn.execute(text("TRUNCATE TABLE habit_completions, habits RESTART IDENTITY CASCADE;"))
+        conn.execute(text("TRUNCATE TABLE habit_completions, habits, users RESTART IDENTITY CASCADE;"))
         conn.commit()
     yield
 
@@ -56,3 +56,9 @@ def client():
     with TestClient(fastapi_app) as c:
         yield c
     fastapi_app.dependency_overrides.clear()
+
+# TODO: finish this helper function
+# def _register_and_login(client, email="test@example.com", password="testpass123") -> str:
+    # POST /auth/register
+    # POST /auth/login (form data)
+    # return access_token
