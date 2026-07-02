@@ -1,5 +1,12 @@
 # app/tests/test_completions.py
 
+def _auth(token):
+    return {"Authorization": f"Bearer {token}"}
+
+# def test_create_habit(client):
+#     token = _register_and_login(client)
+#     r = client.post("/habits", json={...}, headers=_auth(token))
+
 def _create_habit(client) -> int:
     r = client.post("/habits", json={
         "name": "Meditate",

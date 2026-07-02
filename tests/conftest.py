@@ -59,6 +59,6 @@ def client():
 
 # TODO: finish this helper function
 # def _register_and_login(client, email="test@example.com", password="testpass123") -> str:
-    # POST /auth/register
-    # POST /auth/login (form data)
-    # return access_token
+#     POST /auth/register
+#     POST /auth/login (form data)
+#     return access_token

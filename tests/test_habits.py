@@ -1,5 +1,12 @@
 # app/tests/test_habits.py
 
+def _auth(token):
+    return {"Authorization": f"Bearer {token}"}
+
+# def test_create_habit(client):
+#     token = _register_and_login(client)
+#     r = client.post("/habits", json={...}, headers=_auth(token))
+
 def _create_habit(client, name, number) -> int:
     r = client.post("/habits", json={
         "name": name,
