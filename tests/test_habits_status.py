@@ -1,4 +1,6 @@
-# app/tests/test_habits_status.py
+# tests/test_habits_status.py
+
+from tests.conftest import _register_and_login, _auth
 
 def _auth(token):
     return {"Authorization": f"Bearer {token}"}

@@ -1,4 +1,4 @@
-# app/tests/test_health.py
+# tests/test_health.py
 
 def test_health_returns_healthy(client):
     r = client.get("/health")

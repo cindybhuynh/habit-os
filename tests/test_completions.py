@@ -1,4 +1,6 @@
-# app/tests/test_completions.py
+# tests/test_completions.py
+
+from tests.conftest import _register_and_login, _auth
 
 def _auth(token):
     return {"Authorization": f"Bearer {token}"}

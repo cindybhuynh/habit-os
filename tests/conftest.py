@@ -1,4 +1,4 @@
-# app/tests/conftest.py
+# tests/conftest.py
 
 import os
 import pytest
@@ -58,7 +58,21 @@ def client():
     fastapi_app.dependency_overrides.clear()
 
 # TODO: finish this helper function
-# def _register_and_login(client, email="test@example.com", password="testpass123") -> str:
-#     POST /auth/register
-#     POST /auth/login (form data)
-#     return access_token
+def _register_and_login(client, email="test@example.com", password="testpass123") -> str:
+    r = client.post("/auth/register", json={
+        "email": email,
+        "password": password,
+    })
+
+    assert r.status_code == 201
+
+    r = client.post("/auth/login", data={
+        "username": email,
+        "password": password,
+    })
+    
+    assert r.status_code == 200
+    return r.json()["access_token"] 
+
+def _auth(token):
+    return {"Authorization": f"Bearer {token}"}
