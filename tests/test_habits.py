@@ -92,15 +92,7 @@ def test_list_habits_requires_auth(client):
 
 def test_user_cannot_access_other_users_habit(client):
     token1 = _register_and_login(client, email="user1@example.com")
-    habit_id = _create_habit(client, token1, "Mediation", 2)
-
-    payload = {
-        "name": "Meditate",
-        "schedule_type": "daily",
-        "target_count": 1,
-        "start_date": "2026-01-06",
-        "notes": None,
-    }
+    habit_id = _create_habit(client, token1, "Meditation", 2)
 
     token2 = _register_and_login(client, email="user2@example.com")
 
