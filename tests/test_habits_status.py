@@ -2,16 +2,11 @@
 
 from tests.conftest import _register_and_login, _auth
 
-def _auth(token):
-    return {"Authorization": f"Bearer {token}"}
-
-# def test_create_habit(client):
-#     token = _register_and_login(client)
-#     r = client.post("/habits", json={...}, headers=_auth(token))
-
 def test_habits_status_no_completions(client):
+    token = _register_and_login(client)
+
     # Create habit
-    r = client.post("/habits", json={
+    r = client.post("/habits", headers=_auth(token), json={
         "name": "Drink water",
         "schedule_type": "daily",
         "target_count": 8,
@@ -21,7 +16,7 @@ def test_habits_status_no_completions(client):
     assert r.status_code == 201
     habit_id = r.json()["id"]
 
-    r = client.get("/habits/status?for_date=2026-01-07")
+    r = client.get("/habits/status?for_date=2026-01-07", headers=_auth(token))
     assert r.status_code == 200
     data = r.json()
     assert len(data) == 1
@@ -32,8 +27,10 @@ def test_habits_status_no_completions(client):
 
 
 def test_habits_status_with_completion(client):
+    token = _register_and_login(client)
+
     # Create habit
-    r = client.post("/habits", json={
+    r = client.post("/habits", headers=_auth(token), json={
         "name": "Stretch",
         "schedule_type": "daily",
         "target_count": 1,
@@ -44,14 +41,14 @@ def test_habits_status_with_completion(client):
     habit_id = r.json()["id"]
 
     # Create completion for that date
-    r = client.post(f"/habits/{habit_id}/completions", json={
+    r = client.post(f"/habits/{habit_id}/completions", headers=_auth(token), json={
         "done_on": "2026-01-07",
         "count": 1,
         "notes": None,
     })
     assert r.status_code == 201
 
-    r = client.get("/habits/status?for_date=2026-01-07")
+    r = client.get("/habits/status?for_date=2026-01-07", headers=_auth(token))
     assert r.status_code == 200
     data = r.json()
     assert len(data) == 1
