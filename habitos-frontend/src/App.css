@@ -1,3 +1,5 @@
+/* habitos-frontend/src/App.css */
+
 * {
   margin: 0;
   padding: 0;
@@ -17,6 +19,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #0f0f17;
 }
 
 .login-container {
@@ -109,6 +112,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.create-habit-form h2{
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #e2e8f0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 .create-habit-form input {
   width: 100%;
   padding: 12px;
@@ -132,6 +142,10 @@ body {
   color: white;
 }
 
+.create-habit-form button:hover {
+  background-color: #192bce;
+}
+
 .create-habit-form select {
   width: 100%;
   padding: 12px;
@@ -141,4 +155,44 @@ body {
   font-size: 14px;
   background-color: #25263b;
   color: #e2e8f0;
+}
+
+.error-message {
+  color: #f87171;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.logout-button {
+  width: 30%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #2b3ee6;
+  color: white;
+}
+
+.logout-button:hover {
+  background-color: #192bce;
+}
+
+.switch-to-register-button {
+  color: #2b3ee6;
+  margin-top: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.switch-to-login-button {
+  color: #2b3ee6;
+  margin-top: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  cursor: pointer;
 }

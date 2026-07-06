@@ -1,7 +1,12 @@
+// habitos-frontend/src/Dashboard.jsx
+
 import { useState, useEffect } from 'react'
 import './App.css'
+import apiFetch from './apiFetch'
 
-function Dashboard() {
+const API_URL = import.meta.env.VITE_API_URL
+
+function Dashboard({onLogout}) {
     const [habits, setHabits] = useState([])
     const [habitName, setHabitName] = useState('')
     const [scheduleType, setScheduleType] = useState('daily')
@@ -11,7 +16,7 @@ function Dashboard() {
     useEffect(() => {
         const fetchHabits = async () => {
             try {
-            const response = await fetch('http://localhost:8000/habits')
+            const response = await apiFetch(`${API_URL}/habits`)
             const data = await response.json()
             setHabits(data)
             } catch (error) {
@@ -22,11 +27,8 @@ function Dashboard() {
     }, [])
     const handleCreateHabit = async () => {
         try {
-            const response = await fetch('http://localhost:8000/habits', {
+            const response = await apiFetch(`${API_URL}/habits`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
             body: JSON.stringify({
                 name: habitName,
                 schedule_type: scheduleType,
@@ -47,12 +49,13 @@ function Dashboard() {
     }
     const toggleHabit = async (habitId) => {
         const today = new Date().toISOString().split('T')[0];
-        const res = await fetch(
-            `http://localhost:8000/habits/${habitId}/completions/toggle/${today}`,
+        const res = await apiFetch(
+            `${API_URL}/habits/${habitId}/completions/toggle/${today}`,
             { method: 'POST' }
         );
         const data = await res.json();
-        // Update the habit's completed status in your state
+
+        // Update the habit's completed status 
         setHabits(prev => prev.map(h => 
             h.id === habitId ? { ...h, completed: data.completed } : h
         ));
@@ -60,6 +63,7 @@ function Dashboard() {
     return(
         <div className='dashboard'>
             <h1>Dashboard</h1>
+            <button className='logout-button' onClick={onLogout}>Log Out</button>
             <p>You are logged in!</p>
 
             <div className='create-habit-form'>
