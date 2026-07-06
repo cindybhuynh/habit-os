@@ -1,7 +1,5 @@
 // habitos-frontend/src/apiFetch.js
 
-const API_URL = import.meta.env.VITE_API_URL
-
 async function apiFetch(url, options = {}) {
     const token = localStorage.getItem('token')
 
