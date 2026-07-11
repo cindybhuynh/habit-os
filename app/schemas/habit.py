@@ -36,6 +36,6 @@ class HabitReadWithStatus(HabitRead): # defines habit data and completed status 
     completion_count_on_date: int
     date: date
 
-class HabitHistoryEntry(HabitRead): # defines habit history entry on heatmap
+class HabitHistoryEntry(BaseModel): # defines habit history entry on heatmap
     date: date
     count: int

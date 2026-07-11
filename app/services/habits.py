@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models.habit import Habit
 from app.models.completion import HabitCompletion
-from app.schemas.habit import HabitCreate, HabitRead, HabitReadWithStatus
+from app.schemas.habit import HabitCreate, HabitRead, HabitReadWithStatus, HabitHistoryEntry
+from app.services.completions import HabitNotFoundError
 
 
 class HabitAlreadyExistsError(Exception):
@@ -85,7 +86,30 @@ class HabitStore:
             )
             for h in habits
         ]
+    
+    def get_habit_history(self, habit_id: int, user_id: int, start_date: dt_date, end_date: dt_date) -> list[HabitHistoryEntry]:
+        
+        habit = self.db.execute(
+            select(Habit)
+            .where(Habit.id == habit_id)
+            .where(Habit.user_id == user_id)
+        ).scalar_one_or_none()
 
+        if habit is None:
+            raise HabitNotFoundError()
+        
+        completions = self.db.execute(
+            select(HabitCompletion)
+            .where(HabitCompletion.habit_id == habit_id)
+            .where(HabitCompletion.done_on >= start_date)
+            .where(HabitCompletion.done_on <= end_date)
+            .order_by(HabitCompletion.done_on)
+        ).scalars().all()
 
+        return [
+            HabitHistoryEntry(date=c.done_on, count=c.count)
+            for c in completions
+        ]
+    
 def get_store(db: Session = Depends(get_db)) -> HabitStore:
     return HabitStore(db)

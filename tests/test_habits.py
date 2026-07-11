@@ -101,3 +101,32 @@ def test_user_cannot_access_other_users_habit(client):
 
     r = client.delete(f"/habits/{habit_id}", headers=_auth(token2))
     assert r.status_code == 404
+
+def test_habit_history(client):
+    token = _register_and_login(client)
+    habit_id = _create_habit(client, token, "Reading", 1)
+
+    r = client.post(f"/habits/{habit_id}/completions", headers=_auth(token), json={
+        "done_on": "2026-07-05",
+        "count": 1,
+    })
+    assert r.status_code == 201
+
+    r = client.post(f"/habits/{habit_id}/completions", headers=_auth(token), json={
+        "done_on": "2026-07-07",
+        "count": 1,
+    })
+    assert r.status_code == 201
+
+    r = client.post(f"/habits/{habit_id}/completions", headers=_auth(token), json={
+        "done_on": "2026-07-10",
+        "count": 1,
+    })
+    assert r.status_code == 201
+
+    r = client.get(f"/habits/{habit_id}/history?start_date=2026-07-01&end_date=2026-07-20", headers=_auth(token))
+    data = r.json()
+    assert r.status_code == 200
+    assert len(data) == 3 
+    assert data[0]["date"] == "2026-07-05"
+    assert data[0]["count"] == 1
