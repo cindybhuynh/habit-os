@@ -1,5 +1,61 @@
 /* habitos-frontend/src/App.css */
 
+:root {
+  /* Ocean Blue */
+  --blue-50:  #E8F6FB;
+  --blue-100: #C4E8F4;
+  --blue-200: #94D5EB;
+  --blue-400: #39B6DC;
+  --blue-500: #15A0D8;
+  --blue-600: #1A6CA1;
+  --blue-700: #15416A;
+  --blue-800: #0E2E4C;
+
+  /* Sunset Yellow */
+  --yellow-100: #FFF6B8;
+  --yellow-300: #FFEA3D;
+  --yellow-400: #FFDB31;
+  --yellow-500: #E8C020;
+
+  /* Neutrals — warm cream */
+  --cream-50:  #FDFAF1;
+  --cream-100: #F9F3E1;
+  --cream-200: #F0E8D0;
+  --white:     #FEFDF9;
+
+  /* Semantic */
+  --green:  #80A269;
+  --lime:   #C9ED47;
+  --orange: #F59223;
+
+  /* Roles */
+  --bg-base:         var(--cream-50);
+  --bg-surface:      var(--white);
+  --text-primary:    var(--blue-700);
+  --text-muted:      var(--blue-600);
+  --text-heading:    var(--blue-800);
+  --accent:          var(--blue-500);
+  --accent-hover:    var(--blue-600);
+  --highlight:       var(--yellow-400);
+  --error:           var(--orange);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Type scale */
+  --font-sm: 14px;
+  --font-base: 16px;
+  --font-lg: 20px;
+  --font-xl: 24px;
+  --font-2xl: 32px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,11 +63,13 @@
 }
 
 body {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-base);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #0f0f17;
 }
 
 #root {
@@ -19,11 +77,12 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #0f0f17;
+  background-color: var(--bg-base);
 }
 
 .login-container {
-  background-color: #1a1b30;
+  background-color: var(--bg-surface);
+  box-shadow: 0 4px 20px rgba(21, 65, 106, 0.08);
   width: 360px;
   padding: 40px;
   border-radius: 12px;
@@ -33,9 +92,8 @@ body {
 }
 
 .login-container h1 {
-  color: #e2e8f0;
+  color: var(--text-primary);
   margin-bottom: 30px;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 37px;
 }
 
@@ -46,8 +104,8 @@ body {
   border: 1px solid #333;
   border-radius: 8px;
   font-size: 14px;
-  background-color: #25263b;
-  color: #e2e8f0;
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
 }
 
 .login-container button {
@@ -57,66 +115,60 @@ body {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  background-color: #2b3ee6;
-  color: white;
+  background-color: var(--accent);
+  color: var(--bg-surface);
 }
 
 .login-container button:hover {
-  background-color: #192bce;
+  background-color: var(--accent-hover);
 }
 
 .dashboard {
   width: 100%;
   max-width: 600px;
   padding: 40px 20px;
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 .dashboard h1 {
   margin-bottom: 8px;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .dashboard p {
   margin-bottom: 24px;
-  color: #9ca3af;
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-muted);
 }
 
 .habit-card {
-  background-color: #1b1e4c;
-  border: 1px solid #2a2b45;
+  background-color: var(--bg-surface);
+  border: none;
+  box-shadow: 0 2px 8px rgba(26, 76, 122, 0.06);
   padding: 20px;
   border-radius: 9px;
   margin-bottom: 16px;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .habit-card h2 {
   font-size: 18px;
   margin-bottom: 8px;
-  color: #e2e8f0;
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
 }
 
 .habit-card p {
   font-size: 14px;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 4px;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .create-habit-form {
   font-size: 14px;
-  color: #e2e8f0;
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
 }
 
 .create-habit-form h2{
   font-size: 18px;
   margin-bottom: 16px;
-  color: #e2e8f0;
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
 }
 
 .create-habit-form input {
@@ -126,8 +178,8 @@ body {
   border: 1px solid #333;
   border-radius: 8px;
   font-size: 14px;
-  background-color: #25263b;
-  color: #e2e8f0;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .create-habit-form button {
@@ -138,12 +190,12 @@ body {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  background-color: #2b3ee6;
-  color: white;
+  background-color: var(--accent);
+  color: var(--text-primary);
 }
 
 .create-habit-form button:hover {
-  background-color: #192bce;
+  background-color:var(--accent-hover);
 }
 
 .create-habit-form select {
@@ -153,13 +205,12 @@ body {
   border: 1px solid #333;
   border-radius: 8px;
   font-size: 14px;
-  background-color: #25263b;
-  color: #e2e8f0;
+  background-color: var(--accent);
+  color: var(--bg-surface);
 }
 
 .error-message {
-  color: #f87171;
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--error);
   font-size: 16px;
   margin-top: 16px;
   text-align: center;
@@ -173,26 +224,24 @@ body {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  background-color: #2b3ee6;
-  color: white;
+  background-color: var(--accent);
+  color: var(--bg-surface);
 }
 
 .logout-button:hover {
-  background-color: #192bce;
+  background-color: var(--accent-hover);
 }
 
 .switch-to-register-button {
-  color: #2b3ee6;
+  color: var(--accent);
   margin-top: 16px;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 15px;
   cursor: pointer;
 }
 
 .switch-to-login-button {
-  color: #2b3ee6;
+  color: var(--accent);
   margin-top: 16px;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 15px;
   cursor: pointer;
 }
