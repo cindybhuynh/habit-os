@@ -67,12 +67,10 @@ body {
   color: var(--text-primary);
   background-color: var(--bg-base);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 #root {
+  width: 100%;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -83,8 +81,8 @@ body {
 .login-container {
   background-color: var(--bg-surface);
   box-shadow: 0 4px 20px rgba(21, 65, 106, 0.08);
-  width: 360px;
-  padding: 40px;
+  width: 430px;
+  padding: 48px 56px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -244,4 +242,13 @@ body {
   margin-top: 16px;
   font-size: 15px;
   cursor: pointer;
+}
+
+.login-page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
