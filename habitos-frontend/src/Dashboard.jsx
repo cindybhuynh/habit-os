@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import apiFetch from './apiFetch'
+import HabitHeatmap from './HabitHeatmap'
+import DailyQuote from './DailyQuote'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -13,6 +15,11 @@ function Dashboard({onLogout}) {
     const [targetCount, setTargetCount] = useState('')
     const [startDate, setStartDate] = useState('')
     const [notes, setNotes] = useState('')
+    const [expandedHabitId, setExpandedHabitId] = useState(null)
+    const [heatmapRefresh, setHeatmapRefresh] = useState(0)
+    const quotes = ["Sunday...", "Monday...", "Tuesday...", "Wednesday...", "Thursday...", "Friday...", "Saturday..."];
+    const todayQuote = quotes[new Date().getDay()];
+
     useEffect(() => {
         const fetchHabits = async () => {
             try {
@@ -25,6 +32,7 @@ function Dashboard({onLogout}) {
         }
         fetchHabits()
     }, [])
+
     const handleCreateHabit = async () => {
         try {
             const response = await apiFetch(`${API_URL}/habits`, {
@@ -47,6 +55,7 @@ function Dashboard({onLogout}) {
             console.log('Error creating habit:', error)
         }
     }
+
     const toggleHabit = async (habitId) => {
         const today = new Date().toISOString().split('T')[0];
         const res = await apiFetch(
@@ -55,16 +64,19 @@ function Dashboard({onLogout}) {
         );
         const data = await res.json();
 
-        // Update the habit's completed status 
         setHabits(prev => prev.map(h => 
-            h.id === habitId ? { ...h, completed: data.completed } : h
+            h.id === habitId ? { ...h, completed_on_date: data.completed } : h
         ));
+        
+        setHeatmapRefresh(prev => prev + 1)  // trigger heatmap refetch
     };
+
     return(
         <div className='dashboard'>
             <h1>Dashboard</h1>
             <button className='logout-button' onClick={onLogout}>Log Out</button>
-            <p>You are logged in!</p>
+            <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            <p><strong><DailyQuote quote={todayQuote} /></strong></p>
 
             <div className='create-habit-form'>
                 <h2>Create a New Habit</h2>
@@ -99,14 +111,29 @@ function Dashboard({onLogout}) {
             </div>
             {habits.map((habit) => (
                 <div key={habit.id} className="habit-card">
-                    <input 
-                        type="checkbox" 
-                        checked={habit.completed || false} 
-                        onChange={() => toggleHabit(habit.id)} 
-                    />
-                    <h2>{habit.name}</h2>
-                    <p>{habit.schedule_type} · Target: {habit.target_count}</p>
-                    {habit.notes && <p>{habit.notes}</p>}
+                    <div className="habit-card-header" onClick={() => 
+                        setExpandedHabitId(expandedHabitId === habit.id ? null : habit.id)
+                    }>
+                        <input 
+                            type="checkbox" 
+                            checked={habit.completed_on_date || false} 
+                            onChange={(e) => {
+                                e.stopPropagation()
+                                toggleHabit(habit.id)
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="habit-card-content">
+                            <h2>{habit.name}</h2>
+                            <p>{habit.schedule_type} · Target: {habit.target_count}</p>
+                            {habit.notes && <p>{habit.notes}</p>}
+                        </div>
+                    </div>
+                    {expandedHabitId === habit.id && (
+                        <div className="habit-heatmap">
+                            <HabitHeatmap habitId={habit.id} refreshKey={heatmapRefresh} />
+                        </div>
+                    )}
                 </div>
             ))}
         </div>

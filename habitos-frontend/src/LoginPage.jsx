@@ -54,23 +54,22 @@ function LoginPage({onLogin, onSwitchToRegister}) {
         {error && <p className="error-message">{error}</p>}
       </div>
       <Wave
-      //  fill='#15A0D8'
        paused={false}
-       options={{height: 45, amplitude: 20, speed: 0.13, points: 3 }}
+       options={{height: 55, amplitude: 20, speed: 0.13, points: 3 }}
        style={{
         position: 'absolute',
         bottom: -7,
         left: 0,
         right: 0,
         display: 'block',
-        opacity: 0.8,
+        opacity: 0.7,
         marginBottom: 0,
        }}
        mask="url(#mask)" 
        fill="#15A0D8">
         <defs>
           <linearGradient id="gradient" gradientTransform="rotate(90)">
-            <stop offset="0" stopColor="white" />
+            <stop offset="0.4" stopColor="white" />
             <stop offset="1" stopColor="black" />
           </linearGradient>
           <mask id="mask">
