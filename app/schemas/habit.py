@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, ConfigDict, field_validator
 
 
 class HabitCreate(BaseModel): # defines habit creation data
-    name: str = Field(min_length=1, max_length=200)
+    name: str = Field(..., min_length=1, max_length=200) # Field(...) makes this required
     schedule_type: Literal["daily", "weekly"]
     target_count: int = Field(ge=1, le=1000)
     start_date: date

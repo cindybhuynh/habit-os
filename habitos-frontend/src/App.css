@@ -27,7 +27,7 @@
   /* Semantic */
   --green:  #80A269;
   --lime:   #C9ED47;
-  --orange: #F59223;
+  --red: #e3503f;
 
   /* Roles */
   --bg-base:         var(--cream-50);
@@ -38,7 +38,7 @@
   --accent:          var(--blue-500);
   --accent-hover:    var(--blue-600);
   --highlight:       var(--yellow-400);
-  --error:           var(--orange);
+  --error:           var(--red);
 
   /* Spacing scale */
   --space-1: 4px;
@@ -210,6 +210,12 @@ body {
   color: var(--text-primary);
 }
 
+.create-habit-form p {
+  font-size: 21px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
 .error-message {
   color: var(--error);
   font-size: 16px;
@@ -294,4 +300,35 @@ body {
   padding: 6px 10px !important;
   font-size: 13px !important;
   font-family: 'Nunito', sans-serif !important;
+}
+
+.quote-container {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background-color: var(--cream-100);
+  border-left: 5px solid var(--accent);
+  border-radius: 4px;
+}
+
+.quote-container blockquote {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.delete-habit-button {
+  padding: 6px 14px;
+  background-color: transparent;
+  color: var(--error);
+  border: 1px solid var(--error);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.delete-habit-button:hover {
+  background-color: var(--error);
+  color: var(--bg-surface);
 }

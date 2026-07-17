@@ -17,8 +17,7 @@ function Dashboard({onLogout}) {
     const [notes, setNotes] = useState('')
     const [expandedHabitId, setExpandedHabitId] = useState(null)
     const [heatmapRefresh, setHeatmapRefresh] = useState(0)
-    const quotes = ["Sunday...", "Monday...", "Tuesday...", "Wednesday...", "Thursday...", "Friday...", "Saturday..."];
-    const todayQuote = quotes[new Date().getDay()];
+    const [error, setError] = useState('')
 
     useEffect(() => {
         const fetchHabits = async () => {
@@ -34,6 +33,11 @@ function Dashboard({onLogout}) {
     }, [])
 
     const handleCreateHabit = async () => {
+        setError('')
+        if (!habitName.trim() || !targetCount || !startDate) {
+            setError('Please fill in habit name, target count, and start date')
+            return
+        }
         try {
             const response = await apiFetch(`${API_URL}/habits`, {
             method: 'POST',
@@ -71,12 +75,30 @@ function Dashboard({onLogout}) {
         setHeatmapRefresh(prev => prev + 1)  // trigger heatmap refetch
     };
 
+    const handleDeleteHabit = async (habitId) => {
+        if (!confirm('Delete this habit? This cannot be undone.')) {
+            return
+        }
+
+        try {
+            const response = await apiFetch(`${API_URL}/habits/${habitId}`, {
+                method: 'DELETE',
+            })
+
+            if (response.status === 204) {
+                setHabits(prev => prev.filter(h => h.id !== habitId))
+            }
+        } catch(error) {
+            console.log('Error deleting habit', error)
+        }
+    }
+
     return(
         <div className='dashboard'>
             <h1>Dashboard</h1>
             <button className='logout-button' onClick={onLogout}>Log Out</button>
             <p>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-            <p><strong><DailyQuote quote={todayQuote} /></strong></p>
+            <DailyQuote />
 
             <div className='create-habit-form'>
                 <h2>Create a New Habit</h2>
@@ -108,6 +130,7 @@ function Dashboard({onLogout}) {
                     onChange={(e) => setNotes(e.target.value)}
                 />
                 <button onClick={handleCreateHabit}>Add Habit</button>
+                {error && <p className="error-message">{error}</p>}
             </div>
             {habits.map((habit) => (
                 <div key={habit.id} className="habit-card">
@@ -128,6 +151,15 @@ function Dashboard({onLogout}) {
                             <p>{habit.schedule_type} · Target: {habit.target_count}</p>
                             {habit.notes && <p>{habit.notes}</p>}
                         </div>
+                        <button 
+                            className="delete-habit-button" 
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteHabit(habit.id)
+                            }}
+                        >
+                            Delete
+                        </button>
                     </div>
                     {expandedHabitId === habit.id && (
                         <div className="habit-heatmap">
