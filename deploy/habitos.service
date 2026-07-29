@@ -1,0 +1,16 @@
+[Unit]
+Description=HabitOS FastAPI backend
+After=network.target
+
+[Service]
+User=ec2-user
+Group=ec2-user
+WorkingDirectory=/home/ec2-user/habit-os
+Environment="PATH=/home/ec2-user/habit-os/.venv/bin"
+EnvironmentFile=/home/ec2-user/habit-os/.env
+ExecStart=/home/ec2-user/habit-os/.venv/bin/gunicorn -w 2 -k uvicorn.workers.UvicornWorker app.main:app --bind 127.0.0.1:8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
