@@ -23,10 +23,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# app.add_middleware(
+#     CORSMiddleware, # allows other origins to make requests
+#     allow_origins=["http://localhost:5173"], # allows react app to make requests
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
+
 app.add_middleware(
-    CORSMiddleware, # allows other origins to make requests
-    allow_origins=["http://localhost:5173"], # allows react app to make requests
-    allow_credentials=True,
+    CORSMiddleware,
+    allow_origins=["*"],  # TODO: restrict to CloudFront URL after deployment
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
