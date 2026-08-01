@@ -33,7 +33,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: restrict to CloudFront URL after deployment
+    allow_origins=[
+        "https://habitos.cindybhuynh.com",
+        "http://localhost:5173",
+    ],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
