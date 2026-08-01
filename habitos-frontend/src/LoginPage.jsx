@@ -55,7 +55,7 @@ function LoginPage({onLogin, onSwitchToRegister}) {
       </div>
       <Wave
        paused={false}
-       options={{height: 55, amplitude: 20, speed: 0.13, points: 3 }}
+       options={{height: 45, amplitude: 20, speed: 0.13, points: 3 }}
        style={{
         position: 'absolute',
         bottom: -7,
