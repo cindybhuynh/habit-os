@@ -1,100 +1,101 @@
 # HabitOS
 
-HabitOS is a full-stack habit tracking app built with React, FastAPI, and PostgreSQL.
-It supports managing habits and daily activity records (completions/check-ins),
-with a service layer, Pydantic schemas, SQLAlchemy ORM models, Alembic 
-migrations, and a pytest test suite.
-The React frontend provides a login interface, 
-a dashboard displaying live habit data, 
-and a form for creating new habits 
-which are connected to the backend via REST API calls.
+A full-stack habit tracker with calendar heatmaps for visualizing consistency over time.
 
-> Status: Active development (v1).
+**Live Demo:** [habitos.cindybhuynh.com](https://habitos.cindybhuynh.com)  
+**Repository:** [github.com/cindybhuynh/habit-os](https://github.com/cindybhuynh/habit-os)
+
+![CI Status](https://github.com/cindybhuynh/habit-os/actions/workflows/test.yml/badge.svg)
 
 <p align="center">
-   <img src="screenshots/login.png" alt="HabitOS Login" width="550">
-   <br>
-   <img src="screenshots/dashboard.png" alt="HabitOS Dashboard" width="550">
+  <img src="screenshots/login.png" alt="Login page with animated wave" width="1200">
+  <br>
+  <em>Authentication — Minimalist interface with dynamic wave canvas</em>
 </p>
 
----
 
-## Why I Built This
+## Overview
 
-I'm deeply interested in the intersection between computer science and psychology. 
-Specifically in areas of self improvement and building small but compounding habits.
-After taking Algorithm Design I at the University of Missouri, I understood C fundamentals but I hadn't built anything with a real tech stack. HabitOS was my way of building APIs, tests, a real database, and using project-based learning to simulate a real world setting.
+HabitOS lets users create daily and weekly habits, toggle completions, and see their consistency over the past year through calendar heatmaps.
 
----
 
-## Tech Stack
+## Why I Built This ✨
 
-- **Frontend**: React, JavaScript, HTML/CSS
-- **API**: FastAPI (Python)
-- **DB**: PostgreSQL
-- **ORM**: SQLAlchemy
-- **Migrations**: Alembic
-- **Tests**: pytest (integration-style API tests)
-- **Containerization**: Docker + docker-compose
+I’m fascinated by the intersection of computer science and psychology. In particular, the small, compounding habits that shape our daily lives. 
 
----
+I wanted to bridge that curiosity with a complete, end-to-end engineering workflow. Building HabitOS from an initial blank commit to a live AWS deployment allowed me to design a system from start to finish: making intentional architectural decisions, enforcing API security, and shipping an interactive tool that people can genuinely use every day.
 
-## Getting Started
-1. Create venv: `python -m venv .venv`
-2. Activate: `source .venv/bin/activate`
-3. Install: `pip install -r requirements.txt`
-4. Run: `uvicorn app.main:app --reload`
+<p align="center">
+  <img src="screenshots/habit-heatmap.png" alt="Dashboard page with habits and a heatmap" width="1200">
+  <br>
+  <em>Dashboard — Interactive year-long completion heatmaps</em>
+</p>
 
-For Docker:
+
+## Core Features ⭐️
+
+* **Habits and completions:** Users can create daily or weekly habits, toggle completions, add optional notes, and delete habits with confirmation.
+* **Per-Habit Heatmaps:** Year-long completion heatmaps powered by custom CSS and `react-calendar-heatmap`.
+* **State Management:** Centralized `apiFetch` wrapper attaches JWT tokens and handles expired sessions by redirecting to login.
+* **Design System:** Single-family typography (`Nunito`) paired with an ocean/sunset palette derived from personal film photography.
+
+## Tech Stack 
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React (Vite), react-calendar-heatmap, react-wavify |
+| **Backend API** | FastAPI (Python), SQLAlchemy, Alembic, python-jose (JWT), pytest |
+| **Database** | PostgreSQL 17 (AWS RDS) |
+| **Infrastructure** | AWS (EC2, S3, CloudFront, ACM), Cloudflare (DNS + Registrar), Let's Encrypt (nginx SSL), GitHub Actions CI/CD |
+
+## Architecture Diagram
+<p align="center">
+  <img src="screenshots/architecture-diagram.png" alt="Architecture diagram of tech stack" width="700">
+  <br>
+  <em>Architecture Diagram — Technology Stack</em>
+</p>
+
+## Architectural Decisions
+
+* **Ownership through parent relationships:** `HabitCompletion` records don't store their own `user_id`. Ownership is verified once through the parent habit, and queries scoped to `habit_id` are automatically scoped to the correct user. This is cleaner and prevents over-filtering bugs.
+
+* **404 instead of 403 for cross-user access:** When a user tries to access another user's habits, the API returns a 404 error instead of a 403 error. A 403 error would leak that the data exists but isn't theirs.
+
+* **Same error for missing user vs wrong password:** Identical error responses prevent attackers from enumerating registered emails.
+
+* **JWT algorithm allowlist:** `jwt.decode()` is called with `algorithms=["HS256"]` as an explicit list, blocking algorithm-substitution attacks like `alg: none`.
+
+* **Real Postgres in CI:** GitHub Actions runs pytest against a real Postgres 17 service container, not SQLite. Catches version-specific behavior differences that SQLite would silently mask.
+
+## Running Locally 
+**Backend:**
+```bash
+# Clone and enter repository
+git clone https://github.com/cindybhuynh/habit-os.git
+cd habit-os
+
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies and start server
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
-docker-compose up -d
-```
-API available at `http://localhost:8000/docs`
+API at `http://localhost:8000/docs`
 
-For the frontend:
-```
+**Frontend:**
+```bash
 cd habitos-frontend
 npm install
 npm run dev
 ```
-Frontend available at `http://localhost:5173`
 
----
+Frontend at `http://localhost:5173`
 
-## Problems I Actually Ran Into
+## Built By 🎆
+* **Cindy Huynh** — Computer Science Student, University of Missouri
+* [LinkedIn](https://www.linkedin.com/in/cindybhuynh) • [GitHub](https://github.com/cindybhuynh)
 
-**Alembic migration conflicts** — When I changed a model schema after already
-running migrations, Alembic's state and the actual database schema fell out of 
-sync. I learned to treat migration history as append-only and stopped trying to 
-edit existing migration files to fix mistakes.
-
-**Docker networking** — Getting FastAPI and PostgreSQL to communicate inside 
-docker-compose meant understanding that containers are isolated. When my connection string pointed to localhost instead of the Docker service name, FastAPI couldn't reach Postgres, and the error messages pointed to the database rather than the network configuration. I learned to trace connectivity issues from the container, rather than taking error messages at face value.
-
-**Understanding my own code** — The hardest problem isn't technical. SQLAlchemy 
-sessions, Alembic's migration graph, and FastAPI's dependency injection system 
-all have mental models that take time to internalize. I ended up copy-pasting patterns I didn't fully understand. 
-Now, I've created a rule to not move forward on a new feature until I can explain the previous one clearly.
-Sometimes that means sitting with confusion longer than feels comfortable.
-
-**CORS and cross-origin communication** — When the React frontend first tried to reach the FastAPI backend, the browser blocked the request. 
-The frontend runs on port 5173 and the backend on port 8000. 
-Since they were on different ports, the browser blocked the requests by default. I fixed this by adding CORS middleware to FastAPI, but debugging it was complicated by a 500 error in the backend that hid the real issue. 
-I learned to read error messages carefully and check backend code to ensure it was running correctly before fixing the connection to the frontend.
-
----
-
-## What's Next
-The frontend dashboard and habit creation form are complete. 
-Current priorities:
-1. **Habit completion toggle** — Mark habits as done for the day directly from 
-   the dashboard, with visual feedback on completion status.
-2. **Authentication** — JWT-based user accounts so the API can support multiple 
-   users with isolated data.
-3. **Analytics endpoints** — Streaks, completion rates, and date-range trend 
-   queries on the dashboard.
-4. **AWS deployment** — Deploy the full stack with a live HTTPS URL and custom domain.
-5. **ML-based recommendations** — Pattern detection on habit completion data 
-   to identify which habits correlate with streak success. The long-term goal is using 
-   the habit data to spot behavioral patterns, connecting to my interest in neuroscience 
-   and behavioral AI.
+## License
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
